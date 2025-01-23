@@ -36,6 +36,8 @@ private:
 
   // option
   bool disable_dist_init = false;
+  int field_of_view_radius = 0; // field_of_view_radius - 
+          // each agent must keep away from other agents by at least this radius.
 
   // result of priority inheritance: true -> valid, false -> invalid
   bool funcPIBT(Agent* ai, Agent* aj = nullptr);
