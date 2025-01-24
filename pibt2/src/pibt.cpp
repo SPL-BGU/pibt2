@@ -19,6 +19,8 @@ void PIBT::occupy(Agents & occupied, Node * node, Agent * agent){
 
 void PIBT::run()
 {
+  // Set the given field of view radius
+  P->setFieldOfViewRadius(field_of_view_radius);
   // compare priority of agents
   auto compare = [](Agent* a, const Agent* b) {
     if (a->elapsed != b->elapsed) return a->elapsed > b->elapsed;
@@ -155,20 +157,30 @@ bool PIBT::funcPIBT(Agent* ai, Agent* aj)
 
 void PIBT::setParams(int argc, char* argv[])
 {
+  bool field_of_view_radius_provided = false;
   struct option longopts[] = {
       {"disable-dist-init", no_argument, 0, 'd'},
+      {"field-of-view-radius", required_argument, nullptr, 'r'},
       {0, 0, 0, 0},
   };
   optind = 1;  // reset
   int opt, longindex;
-  while ((opt = getopt_long(argc, argv, "d", longopts, &longindex)) != -1) {
+  while ((opt = getopt_long(argc, argv, "dr:", longopts, &longindex)) != -1) {
     switch (opt) {
       case 'd':
         disable_dist_init = true;
         break;
+      case 'r':
+        field_of_view_radius_provided = true;
+        field_of_view_radius = std::stoi(optarg);
+        break;
       default:
         break;
     }
+  }
+  if (!field_of_view_radius_provided) {
+    std::cerr << "Error: The -r (or --field-of-view-radius) option is required." << std::endl;
+    exit(1);
   }
 }
 
@@ -178,5 +190,9 @@ void PIBT::printHelp()
             << "  -d --disable-dist-init"
             << "        "
             << "disable initialization of priorities "
-            << "using distance from starts to goals" << std::endl;
+            << "using distance from starts to goals\n"
+            << "  -r --field-of-view-radius"
+            << "     "
+            << "radius that other agents may see each other\n"
+            << std::endl;
 }
