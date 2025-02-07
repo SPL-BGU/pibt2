@@ -29,17 +29,6 @@ inline size_t get_num_of_agent_groups(MAPF_Instance* P, size_t k)
   return P->getNum() / k;
 }
 
-/**
- * @brief Get the agent group id.
- *
- * @note The group is determined by the agent_id divided by k.
- *
- * @param agent_id The mock agent id.
- * @param k The amount of mock agents used for each agent.
- * @return size_t The group id.
- */
-inline size_t get_agent_group_id(int agent_id, size_t k) { return agent_id / k; }
-
 bool PIBT::can_occupy(Agents& occupied, Fields& occupied_field_of_view,
                       Node* node, Agent* agent)
 {
@@ -112,6 +101,7 @@ void PIBT::run()
 {
   // Set the given field of view radius
   P->setFieldOfViewRadius(field_of_view_radius);
+  P->setK(k);
   // compare priority of agents
   auto compare = [](Agent* a, const Agent* b) {
     if (a->elapsed != b->elapsed) return a->elapsed > b->elapsed;

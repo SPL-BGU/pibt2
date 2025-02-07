@@ -103,7 +103,7 @@ void Plan::operator+=(const Plan& other)
 
 bool Plan::validate(MAPF_Instance* P) const
 {
-  return validate(P->getConfigStart(), P->getConfigGoal(), P->getFieldOfViewRadius());
+  return validate(P->getConfigStart(), P->getConfigGoal(), P->getFieldOfViewRadius(), P->getK());
 }
 
 bool Plan::validate(MAPD_Instance* P) const
@@ -125,20 +125,20 @@ bool Plan::validate(MAPD_Instance* P) const
     return false;
   }
 
-  return validate(P->getConfigStart(), P->getFieldOfViewRadius());
+  return validate(P->getConfigStart(), P->getFieldOfViewRadius(), P->getK());
 }
 
-bool Plan::validate(const Config& starts, const Config& goals, int field_of_view_radius) const
+bool Plan::validate(const Config& starts, const Config& goals, int field_of_view_radius, int k) const
 {
   // check goal
   if (!sameConfig(last(), goals)) {
     warn("validation, invalid goals");
     return false;
   }
-  return validate(starts, field_of_view_radius);
+  return validate(starts, field_of_view_radius, k);
 }
 
-bool Plan::validate(const Config& starts, int field_of_view_radius) const
+bool Plan::validate(const Config& starts, int field_of_view_radius, int k) const
 {
   if (configs.empty()) return false;
 
@@ -173,18 +173,23 @@ bool Plan::validate(const Config& starts, int field_of_view_radius) const
                ", t=" + std::to_string(t));
           return false;
         }
-        if(t == 1){
-          // Check t-1 as well so that the starts will also be tested:
-          if (in_field_of_view(v_i_t_1, v_j_t_1, field_of_view_radius)){
-            warn("validation, field of view conflict at v=" + std::to_string(v_i_t_1->id) +
-                ", u=" + std::to_string(v_j_t_1->id) + ", t=" + std::to_string(t - 1));
+        size_t agent_group_id_i = get_agent_group_id(i, k);
+        size_t agent_group_id_j = get_agent_group_id(j, k);
+        if (agent_group_id_i != agent_group_id_j) {
+          // Only if the agent groups are different, the field of view should be checked.
+          if(t == 1){
+            // Check t-1 as well so that the starts will also be tested:
+            if (in_field_of_view(v_i_t_1, v_j_t_1, field_of_view_radius)){
+              warn("validation, field of view conflict at v=" + std::to_string(v_i_t_1->id) +
+                  ", u=" + std::to_string(v_j_t_1->id) + ", t=" + std::to_string(t - 1));
+              return false;
+            }
+          }
+          if (in_field_of_view(v_i_t, v_j_t, field_of_view_radius)){
+            warn("validation, field of view conflict at v=" + std::to_string(v_i_t->id) +
+                ", u=" + std::to_string(v_j_t->id) + ", t=" + std::to_string(t));
             return false;
           }
-        }
-        if (in_field_of_view(v_i_t, v_j_t, field_of_view_radius)){
-          warn("validation, field of view conflict at v=" + std::to_string(v_i_t->id) +
-               ", u=" + std::to_string(v_j_t->id) + ", t=" + std::to_string(t));
-          return false;
         }
         if (v_i_t == v_j_t_1 && v_i_t_1 == v_j_t) {
           warn("validation, swap conflict");

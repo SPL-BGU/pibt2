@@ -82,38 +82,38 @@ TEST(Plan, validate)
   Plan plan0;
   plan0.add({v, u});
   plan0.add({u, w});
-  ASSERT_TRUE(plan0.validate({v, u}, {u, w}, 0));
+  ASSERT_TRUE(plan0.validate({v, u}, {u, w}, 0, 1));
 
   // different starts
   Plan plan1;
   plan1.add({v, w});
   plan1.add({u, w});
-  ASSERT_FALSE(plan1.validate({v, u}, {u, w}, 0));
+  ASSERT_FALSE(plan1.validate({v, u}, {u, w}, 0, 1));
 
   // different goals
   Plan plan2;
   plan2.add({v, u});
   plan2.add({v, w});
-  ASSERT_FALSE(plan2.validate({v, u}, {u, w}, 0));
+  ASSERT_FALSE(plan2.validate({v, u}, {u, w}, 0, 1));
 
   // vertex conflict
   Plan plan3;
   plan3.add({v, u});
   plan3.add({u, u});
   plan3.add({u, w});
-  ASSERT_FALSE(plan3.validate({v, u}, {u, w}, 0));
+  ASSERT_FALSE(plan3.validate({v, u}, {u, w}, 0, 1));
 
   // swap conflict
   Plan plan4;
   plan4.add({v, u});
   plan4.add({u, v});
-  ASSERT_FALSE(plan4.validate({v, u}, {u, w}, 0));
+  ASSERT_FALSE(plan4.validate({v, u}, {u, w}, 0, 1));
 
   // invalid move
   Plan plan5;
   plan5.add({v});
   plan5.add({w});
-  ASSERT_FALSE(plan5.validate({v}, {w}, 0));
+  ASSERT_FALSE(plan5.validate({v}, {w}, 0, 1));
 }
 
 TEST(Plan, maxConstraintTime)

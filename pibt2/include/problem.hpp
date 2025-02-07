@@ -47,6 +47,7 @@ protected:
   // Field of View - controls how much margin to keep from different agents.
   // For regular problems just use field_of_view_radius = 0.
   int field_of_view_radius = 0;
+  int k = 1;
 
   // utilities
   void halt(const std::string& msg) const;
@@ -77,6 +78,8 @@ public:
   std::string getInstanceFileName() { return instance; };
   int getFieldOfViewRadius() { return field_of_view_radius; };
   void setFieldOfViewRadius(int new_field_of_view_radius) { field_of_view_radius = new_field_of_view_radius; };
+  int getK() { return k; };
+  void setK(int new_k) { k = new_k; };
 
   void setMaxCompTime(const int t) { max_comp_time = t; }
 };
