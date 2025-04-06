@@ -276,9 +276,6 @@ std::set<size_t> PIBT::funcPIBT(Agent* ai, Agent* aj)
         std::set<size_t> affected_agents_k = funcPIBT(ak, ai);
         if (affected_agents_k.empty()) {
           fallback = true;
-          // remove occupation for the next iterations:
-          deoccupy(occupied_next, occupied_field_of_view_next, u, ai);
-          ai->v_next = nullptr;
           break;  // need to fallback
         }
         else{
@@ -286,8 +283,17 @@ std::set<size_t> PIBT::funcPIBT(Agent* ai, Agent* aj)
           affected_agents.insert(affected_agents_k.begin(), affected_agents_k.end());
         }
       }
+      else{
+        // if we need to move ak, but it has already chosen it's next location,
+        // then we cannot move it, and therefore we need to fallback.
+        fallback = true;
+        break;
+      }
     }
     if (fallback) {
+      // remove occupation for the next iterations:
+      deoccupy(occupied_next, occupied_field_of_view_next, u, ai);
+      ai->v_next = nullptr;
       for (size_t agent_id : affected_agents) {
         Agent* ak = all_agents[agent_id];
         deoccupy(occupied_next, occupied_field_of_view_next, ak->v_next, ak);
